@@ -76,7 +76,7 @@ export default function HeroSection() {
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-10 w-full px-6 md:px-10 lg:px-16 pb-0">
+      <div className="relative z-10 w-full px-6 md:px-10 lg:px-16 pt-28 md:pt-1">
         <div className="max-w-5xl text-foreground">
           <motion.p
             initial={{ opacity: 0, y: 20 }}

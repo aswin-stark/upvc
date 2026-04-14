@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function AboutHero() {
   return (
-    <section className="relative min-h-screen flex items-end overflow-hidden">
+    <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 scale-110 animate-slowZoom">
@@ -25,7 +25,7 @@ export default function AboutHero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full px-6 md:px-10 lg:px-16 pb-50">
+      <div className="relative z-10 w-full px-6 md:px-10 lg:px-16 py-24 md:py-0">
         <p className="label-sm mb-6 tracking-[0.3em] opacity-0 animate-fadeUp1">
           About Pristine Windows
         </p>

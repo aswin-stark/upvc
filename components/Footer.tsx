@@ -15,6 +15,7 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
   { href: "/products", label: "Products" },
+  { href: "/services", label: "Services" }, // ✅ added
   { href: "/contact", label: "Contact" },
 ];
 
@@ -220,7 +221,12 @@ export default function Footer() {
         {/* DIVIDER */}
         <div className="border-t border-white/10 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-white/30 gap-3">
           <p>© 2026 Pristine Windows. All rights reserved.</p>
-          <p className="tracking-wide">Premium UPVC Solutions Since 2008</p>
+          <p className="tracking-wide">
+            Developed by{" "}
+            <a href="https://dexaz.in" className="hover:text-white transition">
+              Dexaz Studio
+            </a>
+          </p>
         </div>
       </div>
     </footer>
