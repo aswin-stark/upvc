@@ -12,6 +12,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    unoptimized: true,
+
     remotePatterns: [
       {
         protocol: "https",
@@ -21,6 +23,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  basePath: "/upvc/",
+  assetPrefix: "/upvc/",
 };
 
 export default nextConfig;
