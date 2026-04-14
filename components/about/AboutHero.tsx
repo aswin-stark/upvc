@@ -25,7 +25,7 @@ export default function AboutHero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full px-6 md:px-10 lg:px-16 pb-16">
+      <div className="relative z-10 w-full px-6 md:px-10 lg:px-16 pb-50">
         <p className="label-sm mb-6 tracking-[0.3em] opacity-0 animate-fadeUp1">
           About Pristine Windows
         </p>
