@@ -1,9 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Building2, TrendingUp, Users, Award } from "lucide-react";
+import { Building2, TrendingUp, Users, Award, LucideIcon } from "lucide-react";
 
-const stats = [
+type Stat = {
+  icon: LucideIcon;
+  value: number;
+  suffix: string;
+  label: string;
+};
+
+const stats: Stat[] = [
   { icon: Building2, value: 2000, suffix: "+", label: "Projects Completed" },
   { icon: TrendingUp, value: 15, suffix: "+", label: "Years of Excellence" },
   { icon: Users, value: 50, suffix: "+", label: "Team Members" },
@@ -32,7 +39,12 @@ function useInView(ref: React.RefObject<HTMLDivElement | null>) {
   return isVisible;
 }
 
-function CountUp({ value, trigger }: { value: number; trigger: boolean }) {
+type CountUpProps = {
+  value: number;
+  trigger: boolean;
+};
+
+function CountUp({ value, trigger }: CountUpProps) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -45,10 +57,12 @@ function CountUp({ value, trigger }: { value: number; trigger: boolean }) {
 
     const timer = setInterval(() => {
       start += increment;
+
       if (start >= value) {
         start = value;
         clearInterval(timer);
       }
+
       setCount(Math.floor(start));
     }, stepTime);
 
@@ -58,7 +72,7 @@ function CountUp({ value, trigger }: { value: number; trigger: boolean }) {
   return <>{count}</>;
 }
 
-export default function AboutStats(): JSX.Element {
+export default function AboutStats() {
   const ref = useRef<HTMLDivElement | null>(null);
   const isVisible = useInView(ref);
 
@@ -72,7 +86,11 @@ export default function AboutStats(): JSX.Element {
           <div
             key={label}
             className={`flex flex-col items-center justify-center py-10 px-4 text-center transition-all duration-700
-              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
+              ${
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-6"
+              }
             `}
           >
             <Icon size={18} className="mb-3 opacity-40" aria-hidden="true" />

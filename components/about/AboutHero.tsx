@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function AboutHero(): JSX.Element {
+export default function AboutHero() {
   return (
     <section className="relative min-h-screen flex items-end overflow-hidden">
       {/* Background */}
@@ -38,7 +38,7 @@ export default function AboutHero(): JSX.Element {
           </span>
         </h1>
 
-        <p className="text-base md:text-lg max-w-2xl leading-relaxed  opacity-0 animate-fadeUp3">
+        <p className="text-base md:text-lg max-w-2xl leading-relaxed opacity-0 animate-fadeUp3">
           From a small fabrication unit in Chennai to South India&apos;s most
           trusted UPVC fenestration company — our story is built on precision,
           integrity, and an obsession with quality.

@@ -6,33 +6,44 @@ import { ArrowRight } from "lucide-react";
 import { motion, useInView, useMotionValue, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-const stats = [
+type Stat = {
+  value: number;
+  suffix: string;
+  label: string;
+};
+
+const stats: Stat[] = [
   { value: 2000, suffix: "+", label: "Projects" },
   { value: 15, suffix: "+", label: "Years" },
   { value: 10, suffix: "yr", label: "Warranty" },
   { value: 98, suffix: "%", label: "Satisfaction" },
 ];
 
+type CounterProps = {
+  value: number;
+  suffix: string;
+};
+
 // 🔢 Counter Component
-function Counter({ value, suffix }) {
-  const ref = useRef(null);
+function Counter({ value, suffix }: CounterProps) {
+  const ref = useRef<HTMLSpanElement | null>(null);
   const isInView = useInView(ref, { once: true });
 
   const motionValue = useMotionValue(0);
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    if (isInView) {
-      const controls = animate(motionValue, value, {
-        duration: 2,
-        ease: "easeOut",
-        onUpdate: (latest) => {
-          setDisplay(Math.floor(latest));
-        },
-      });
+    if (!isInView) return;
 
-      return controls.stop;
-    }
+    const controls = animate(motionValue, value, {
+      duration: 2,
+      ease: "easeOut",
+      onUpdate: (latest) => {
+        setDisplay(Math.floor(latest));
+      },
+    });
+
+    return controls.stop;
   }, [isInView, value, motionValue]);
 
   return (
@@ -80,7 +91,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-5xl md:text-7xl lg:text-[8rem] font-black tracking-tight text-foreground leading-none mb-8"
+            className="text-5xl md:text-7xl lg:text-[8rem] font-black tracking-tight leading-none mb-8"
           >
             Windows
             <br />
@@ -97,8 +108,7 @@ export default function HeroSection() {
           >
             Custom-fabricated UPVC doors and windows engineered for energy
             efficiency, acoustic comfort, and lasting elegance. Trusted by{" "}
-            <strong className="text-foreground">2,000+ homes</strong> across
-            South India.
+            <strong>2,000+ homes</strong> across South India.
           </motion.p>
 
           <motion.div
@@ -120,7 +130,7 @@ export default function HeroSection() {
 
             <Link
               href="/products"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-border text-foreground text-sm font-medium tracking-wide transition-all duration-300 hover:bg-muted hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-border text-foreground text-sm font-medium transition-all duration-300 hover:bg-muted hover:scale-105"
             >
               Explore Products
             </Link>

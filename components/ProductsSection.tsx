@@ -2,9 +2,26 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Zap, Shield, Wind, Wrench, TrendingUp, Users } from "lucide-react";
+import {
+  Zap,
+  Shield,
+  Wind,
+  Wrench,
+  TrendingUp,
+  Users,
+  LucideIcon,
+} from "lucide-react";
 
-const products = [
+/* ------------------ Types ------------------ */
+type Product = {
+  title: string;
+  description: string;
+  image: string;
+  icon: LucideIcon;
+  badge: string | null;
+};
+
+const products: Product[] = [
   {
     title: "Custom UPVC Windows",
     description:
@@ -61,9 +78,11 @@ const products = [
   },
 ];
 
-/* ------------------ Scroll Hook ------------------ */
-function useInView(options = {}) {
-  const ref = useRef(null);
+/* ------------------ FIXED HOOK ------------------ */
+function useInView<T extends HTMLElement>(
+  options?: IntersectionObserverInit,
+): [React.RefObject<T | null>, boolean] {
+  const ref = useRef<T | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -77,14 +96,14 @@ function useInView(options = {}) {
     if (ref.current) observer.observe(ref.current);
 
     return () => observer.disconnect();
-  }, []);
+  }, [options]);
 
   return [ref, visible];
 }
 
-/* ------------------ Section ------------------ */
+/* ------------------ SECTION ------------------ */
 export default function ProductsSection() {
-  const [ref, visible] = useInView({ threshold: 0.15 });
+  const [ref, visible] = useInView<HTMLDivElement>({ threshold: 0.15 });
 
   return (
     <section className="border-b border-border bg-background">
@@ -92,14 +111,15 @@ export default function ProductsSection() {
         {/* HEADER */}
         <div
           ref={ref}
-          className={`mb-20 transition-all duration-1000 ease-out
-          ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          className={`mb-20 transition-all duration-1000 ease-out ${
+            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
         >
           <p className="label-sm mb-4 tracking-widest opacity-70">
             What We Offer
           </p>
 
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground leading-tight">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-tight">
             Complete UPVC Solutions
             <br />
             <span className="italic font-extralight">Under One Roof</span>
@@ -112,11 +132,11 @@ export default function ProductsSection() {
             ({ title, description, image, icon: Icon, badge }, i) => (
               <div
                 key={title}
-                className={`group relative overflow-hidden rounded-xl border border-border
-              bg-background shadow-sm hover:shadow-2xl transition-all duration-500
-              hover:-translate-y-2 hover:border-foreground/20
-              ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}
-              transition-all duration-700`}
+                className={`group relative overflow-hidden rounded-xl border border-border bg-background shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 ${
+                  visible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
                 style={{ transitionDelay: `${i * 120}ms` }}
               >
                 {/* IMAGE */}
@@ -126,31 +146,28 @@ export default function ProductsSection() {
                     alt={title}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
-
-                  {/* overlay */}
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-all duration-500" />
                 </div>
 
                 {/* CONTENT */}
                 <div className="absolute inset-0 flex flex-col justify-end p-7">
                   {badge && (
-                    <span className="absolute top-5 right-5 text-[10px] font-bold tracking-widest uppercase bg-white text-black px-3 py-1 rounded-full shadow-md animate-pulse">
+                    <span className="absolute top-5 right-5 text-[10px] font-bold uppercase bg-white text-black px-3 py-1 rounded-full">
                       {badge}
                     </span>
                   )}
 
-                  {/* icon */}
-                  <div className="mb-3 transition-all duration-500 group-hover:translate-x-1 group-hover:scale-110">
+                  <div className="mb-3 group-hover:translate-x-1 transition">
                     <Icon size={22} className="text-white/80" />
                   </div>
 
-                  <h3 className="text-lg font-black text-white mb-2 tracking-tight">
+                  <h3 className="text-lg font-black text-white mb-2">
                     {title}
                   </h3>
 
-                  <p className="text-xs text-white/70 leading-relaxed max-w-[90%]">
+                  <p className="text-xs text-white/70 leading-relaxed">
                     {description}
                   </p>
                 </div>
