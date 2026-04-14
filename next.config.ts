@@ -23,8 +23,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  basePath: "/upvc/",
-  assetPrefix: "/upvc/",
+  basePath: "/upvc",
+  assetPrefix: "/upvc",
 };
 
 export default nextConfig;
