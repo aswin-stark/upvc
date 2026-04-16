@@ -18,7 +18,7 @@ export default function CTASection() {
           <h2 className="text-4xl md:text-6xl font-black tracking-tight text-foreground leading-tight mb-8 opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
             Get Your Free
             <br />
-            <span className="italic font-extralight text-white/80">
+            <span className="italic font-extralight text-black/80">
               Consultation Today
             </span>
           </h2>
