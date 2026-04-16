@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, MessageCircle, Check } from "lucide-react";
+import { ChevronRight, Check } from "lucide-react";
 import EnquiryModal, { type EnquiryProduct } from "@/components/EnquiryModal";
 
 export interface SubPageSpec {
@@ -102,12 +102,37 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
     });
   }
 
+  // ✅ WHATSAPP FUNCTION (NEW)
+  function openWhatsAppEnquiry() {
+    const phoneNumber = "918144721458"; // 🔴 replace with your number
+
+    const message = `
+Hello 👋
+
+I would like a quote for:
+Product: ${title}
+
+Category: ${category}
+
+Specs:
+${specs.map((s) => `- ${s.label}: ${s.value}`).join("\n")}
+
+Please share pricing and availability.
+    `.trim();
+
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message,
+    )}`;
+
+    window.open(url, "_blank");
+  }
+
   const reveal = (key: string) =>
     visible[key] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10";
 
   return (
     <div className="bg-white text-black overflow-x-hidden">
-      {/* ───────── HERO ───────── */}
+      {/* HERO */}
       <section
         ref={heroRef}
         className={`relative min-h-[70vh] flex items-end transition-all duration-700 ${reveal(
@@ -119,36 +144,32 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
             src={heroImage}
             alt={title}
             fill
-            className="object-cover scale-105 animate-[zoom_18s_ease-in-out_infinite_alternate]"
+            className="object-cover scale-105"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
 
-        <div className="relative z-10 w-full px-6 md:px-12 pb-16">
-          <nav className="flex items-center gap-2 text-white/70 text-xs uppercase tracking-widest">
-            <Link href="/products" className="hover:text-white transition">
-              Products
-            </Link>
+        <div className="relative z-10 w-full px-6 md:px-12 pb-16 text-white">
+          <nav className="flex items-center gap-2 text-white/70 text-xs uppercase">
+            <Link href="/products">Products</Link>
             <ChevronRight size={12} />
             <span>{category}</span>
             <ChevronRight size={12} />
             <span className="text-white">{title}</span>
           </nav>
 
-          <h1 className="mt-6 text-5xl md:text-7xl font-black text-white leading-none">
+          <h1 className="mt-6 text-5xl md:text-7xl font-black">
             {title}
             <br />
-            <span className="italic font-extralight text-white/80">
-              {tagline}
-            </span>
+            <span className="italic font-light text-white/80">{tagline}</span>
           </h1>
 
           <p className="mt-6 max-w-xl text-white/70">{description}</p>
         </div>
       </section>
 
-      {/* ───────── FEATURES + SPECS ───────── */}
+      {/* FEATURES + SPECS */}
       <section
         ref={featureRef}
         className={`grid lg:grid-cols-2 border-t transition-all duration-700 ${reveal(
@@ -156,47 +177,33 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
         )}`}
       >
         <div className="p-10 lg:p-16">
-          <h2 className="text-xs uppercase tracking-widest mb-8">
-            Key Features
-          </h2>
+          <h2 className="text-xs uppercase mb-8">Key Features</h2>
 
           <div className="space-y-5">
-            {features.map((f, i) => (
-              <div
-                key={f}
-                className="flex gap-4 items-start hover:translate-x-1 transition"
-                style={{ transitionDelay: `${i * 40}ms` }}
-              >
+            {features.map((f) => (
+              <div key={f} className="flex gap-4 items-start">
                 <div className="w-5 h-5 border flex items-center justify-center mt-1">
                   <Check size={11} />
                 </div>
-                <span className="text-sm text-black/80">{f}</span>
+                <span className="text-sm">{f}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ✅ FIXED SPECIFICATIONS (MOBILE RESPONSIVE ONLY) */}
         <div className="p-10 lg:p-16 bg-black/[0.03]">
-          <h2 className="text-xs uppercase tracking-widest mb-8">
-            Specifications
-          </h2>
+          <h2 className="text-xs uppercase mb-8">Specifications</h2>
 
           <div className="border rounded-xl overflow-hidden">
             {specs.map((s) => (
               <div
                 key={s.label}
-                className="
-                  flex flex-col sm:flex-row sm:justify-between
-                  gap-1 sm:gap-0
-                  px-5 py-4 border-b last:border-b-0
-                  hover:bg-black/5 transition
-                "
+                className="flex flex-col sm:flex-row sm:justify-between px-5 py-4 border-b"
               >
-                <span className="text-xs uppercase text-black/60 break-words max-w-full sm:max-w-[50%]">
+                <span className="text-xs uppercase text-black/60">
                   {s.label}
                 </span>
-                <span className="text-sm font-medium break-words max-w-full sm:max-w-[50%] sm:text-right">
+                <span className="text-sm font-medium sm:text-right">
                   {s.value}
                 </span>
               </div>
@@ -205,51 +212,34 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
         </div>
       </section>
 
-      {/* ───────── VARIANTS ───────── */}
+      {/* VARIANTS */}
       <section
         ref={variantRef}
-        className={`px-6 md:px-12 py-20 transition-all duration-700 ${reveal(
-          "variants",
-        )}`}
+        className={`px-6 md:px-12 py-20 ${reveal("variants")}`}
       >
-        <h2 className="text-3xl md:text-4xl font-black mb-10">
+        <h2 className="text-3xl font-black mb-10">
           Choose Your <span className="font-light italic">Configuration</span>
         </h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {variants.map((v, i) => (
-            <div
-              key={v.name}
-              className="group rounded-xl border overflow-hidden hover:-translate-y-2 hover:shadow-xl transition"
-            >
-              <div className="relative h-60 overflow-hidden">
+          {variants.map((v) => (
+            <div key={v.name} className="border rounded-xl overflow-hidden">
+              <div className="relative h-60">
                 <Image
                   src={v.image}
                   alt={v.name}
                   fill
-                  className="object-cover group-hover:scale-110 transition duration-700"
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition" />
               </div>
 
               <div className="p-6">
                 <h3 className="font-black">{v.name}</h3>
                 <p className="text-xs text-black/60 mt-2">{v.description}</p>
 
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {v.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="text-[10px] px-2 py-1 border rounded-full"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
                 <button
                   onClick={() => openEnquiry(v)}
-                  className="mt-5 w-full bg-black text-white py-3 text-xs uppercase font-bold hover:scale-[1.02] transition"
+                  className="mt-5 w-full bg-black text-white py-3 text-xs uppercase font-bold"
                 >
                   Enquire Now
                 </button>
@@ -259,12 +249,10 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
         </div>
       </section>
 
-      {/* ───────── WHY ───────── */}
+      {/* WHY */}
       <section
         ref={whyRef}
-        className={`px-6 md:px-12 py-20 border-t transition-all duration-700 ${reveal(
-          "why",
-        )}`}
+        className={`px-6 md:px-12 py-20 border-t ${reveal("why")}`}
       >
         <h2 className="text-3xl font-black mb-10">
           Built for <span className="font-light italic">South India</span>
@@ -272,10 +260,7 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 border rounded-xl overflow-hidden">
           {whyPoints.map((p) => (
-            <div
-              key={p.number}
-              className="p-8 hover:bg-black hover:text-white transition"
-            >
+            <div key={p.number} className="p-8">
               <div className="text-4xl font-black opacity-30">{p.number}</div>
               <h3 className="font-bold mt-3">{p.title}</h3>
               <p className="text-xs mt-2 opacity-70">{p.desc}</p>
@@ -294,8 +279,9 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
             </h2>
           </div>
 
+          {/* ✅ UPDATED BUTTON */}
           <button
-            onClick={openGeneralEnquiry}
+            onClick={openWhatsAppEnquiry}
             className="bg-green-500 px-8 py-4 text-xs uppercase font-black hover:scale-105 transition"
           >
             WhatsApp Enquiry
