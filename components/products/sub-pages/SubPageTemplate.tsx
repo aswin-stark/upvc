@@ -107,7 +107,7 @@ export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
     const phoneNumber = "918144721458"; // 🔴 replace with your number
 
     const message = `
-Hello 👋
+Hello,
 
 I would like a quote for:
 Product: ${title}
