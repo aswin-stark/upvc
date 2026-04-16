@@ -33,7 +33,7 @@ const socials = [
 
 export default function SocialSidebar() {
   return (
-    <div className="fixed top-[70px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-1.5 py-1 sm:px-4 sm:py-2 sm:top-[85px]  bg-white/70 backdrop-blur-md rounded-full shadow-md">
+    <div className="fixed top-[130px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-1.5 py-1 sm:px-4 sm:py-2 sm:top-[150px]  bg-white/70 backdrop-blur-md rounded-full shadow-md">
       {socials.map(({ href, label, icon, hoverColor }) => (
         <a
           key={label}

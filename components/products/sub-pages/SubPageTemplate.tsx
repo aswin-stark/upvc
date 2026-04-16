@@ -1,11 +1,15 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, ChevronRight } from "lucide-react";
+import { ChevronRight, MessageCircle, Check } from "lucide-react";
+import EnquiryModal, { type EnquiryProduct } from "@/components/EnquiryModal";
 
 export interface SubPageSpec {
-  category: string;           // e.g. "uPVC Windows"
-  title: string;              // e.g. "Sliding Windows"
-  tagline: string;            // italic light subtitle
+  category: string;
+  title: string;
+  tagline: string;
   heroImage: string;
   description: string;
   features: string[];
@@ -20,196 +24,292 @@ export interface SubPageSpec {
   relatedLinks: { href: string; label: string }[];
 }
 
+type Variant = SubPageSpec["variants"][number];
+
 export default function SubPageTemplate({ data }: { data: SubPageSpec }) {
   const {
-    category, title, tagline, heroImage, description,
-    features, specs, variants, whyPoints, relatedLinks,
+    category,
+    title,
+    tagline,
+    heroImage,
+    description,
+    features,
+    specs,
+    variants,
+    whyPoints,
   } = data;
 
+  const [enquiryProduct, setEnquiryProduct] = useState<EnquiryProduct | null>(
+    null,
+  );
+
+  const [visible, setVisible] = useState<Record<string, boolean>>({});
+
+  const heroRef = useRef<HTMLElement | null>(null);
+  const featureRef = useRef<HTMLElement | null>(null);
+  const variantRef = useRef<HTMLElement | null>(null);
+  const whyRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute("data-reveal");
+          if (id && entry.isIntersecting) {
+            setVisible((prev) => ({ ...prev, [id]: true }));
+          }
+        });
+      },
+      { threshold: 0.15 },
+    );
+
+    const targets = [
+      ["hero", heroRef.current],
+      ["features", featureRef.current],
+      ["variants", variantRef.current],
+      ["why", whyRef.current],
+    ] as const;
+
+    targets.forEach(([id, el]) => {
+      if (el) {
+        el.setAttribute("data-reveal", id);
+        observer.observe(el);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  function openEnquiry(v: Variant) {
+    setEnquiryProduct({
+      name: `${title} — ${v.name}`,
+      category,
+      image: v.image,
+      specs: v.tags,
+      features,
+      description: v.description,
+    });
+  }
+
+  function openGeneralEnquiry() {
+    setEnquiryProduct({
+      name: title,
+      category,
+      image: heroImage,
+      specs: specs.map((s) => `${s.label}: ${s.value}`),
+      features,
+      description,
+    });
+  }
+
+  const reveal = (key: string) =>
+    visible[key] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10";
+
   return (
-    <>
-      {/* ── Hero ── */}
-      <section className="relative min-h-[65vh] flex items-end overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image src={heroImage} alt={title} fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/55 to-transparent" />
+    <div className="bg-white text-black overflow-x-hidden">
+      {/* ───────── HERO ───────── */}
+      <section
+        ref={heroRef}
+        className={`relative min-h-[70vh] flex items-end transition-all duration-700 ${reveal(
+          "hero",
+        )}`}
+      >
+        <div className="absolute inset-0">
+          <Image
+            src={heroImage}
+            alt={title}
+            fill
+            className="object-cover scale-105 animate-[zoom_18s_ease-in-out_infinite_alternate]"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
-        <div className="relative z-10 w-full px-6 md:px-10 lg:px-16 pb-16">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 mb-5" aria-label="Breadcrumb">
-            <Link href="/products" className="text-xs text-muted-foreground hover:text-foreground transition-colors tracking-widest uppercase">
+
+        <div className="relative z-10 w-full px-6 md:px-12 pb-16">
+          <nav className="flex items-center gap-2 text-white/70 text-xs uppercase tracking-widest">
+            <Link href="/products" className="hover:text-white transition">
               Products
             </Link>
-            <ChevronRight size={12} className="text-muted-foreground" />
-            <span className="text-xs text-muted-foreground tracking-widest uppercase">{category}</span>
-            <ChevronRight size={12} className="text-muted-foreground" />
-            <span className="text-xs text-foreground font-medium tracking-widest uppercase">{title}</span>
+            <ChevronRight size={12} />
+            <span>{category}</span>
+            <ChevronRight size={12} />
+            <span className="text-white">{title}</span>
           </nav>
-          <p className="label-sm mb-4">{category}</p>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-foreground leading-none mb-6">
+
+          <h1 className="mt-6 text-5xl md:text-7xl font-black text-white leading-none">
             {title}
             <br />
-            <span className="italic font-extralight">{tagline}</span>
+            <span className="italic font-extralight text-white/80">
+              {tagline}
+            </span>
           </h1>
-          <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">{description}</p>
+
+          <p className="mt-6 max-w-xl text-white/70">{description}</p>
         </div>
       </section>
 
-      {/* ── Features + Specs ── */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 border-b border-border">
-        {/* Key features */}
-        <div className="px-6 md:px-10 lg:px-16 py-16 border-r border-border">
-          <p className="label-sm mb-8">Key Features</p>
-          <ul className="space-y-4">
-            {features.map((f) => (
-              <li key={f} className="flex items-start gap-4">
-                <div className="w-5 h-5 border border-foreground flex items-center justify-center shrink-0 mt-0.5">
-                  <Check size={11} className="text-foreground" />
-                </div>
-                <span className="text-sm text-foreground leading-relaxed">{f}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* ───────── FEATURES + SPECS ───────── */}
+      <section
+        ref={featureRef}
+        className={`grid lg:grid-cols-2 border-t transition-all duration-700 ${reveal(
+          "features",
+        )}`}
+      >
+        <div className="p-10 lg:p-16">
+          <h2 className="text-xs uppercase tracking-widest mb-8">
+            Key Features
+          </h2>
 
-        {/* Technical specs */}
-        <div className="px-6 md:px-10 lg:px-16 py-16 bg-muted/10">
-          <p className="label-sm mb-8">Specifications</p>
-          <div className="space-y-0 border border-border">
-            {specs.map(({ label, value }, i) => (
+          <div className="space-y-5">
+            {features.map((f, i) => (
               <div
-                key={label}
-                className={`flex items-center justify-between px-5 py-4 ${
-                  i < specs.length - 1 ? "border-b border-border" : ""
-                }`}
+                key={f}
+                className="flex gap-4 items-start hover:translate-x-1 transition"
+                style={{ transitionDelay: `${i * 40}ms` }}
               >
-                <span className="text-xs text-muted-foreground tracking-wide uppercase">{label}</span>
-                <span className="text-sm font-medium text-foreground text-right">{value}</span>
+                <div className="w-5 h-5 border flex items-center justify-center mt-1">
+                  <Check size={11} />
+                </div>
+                <span className="text-sm text-black/80">{f}</span>
               </div>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* ── Variants grid ── */}
-      <section className="border-b border-border">
-        <div className="px-6 md:px-10 lg:px-16 py-20">
-          <div className="mb-14">
-            <p className="label-sm mb-4">Available Variants</p>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
-              Choose Your
-              <br />
-              <span className="italic font-extralight">Configuration</span>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border border border-border">
-            {variants.map(({ name, image, tags, description: vDesc }) => (
-              <div key={name} className="group cursor-pointer bg-background relative overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={image}
-                    alt={name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/50 transition-all duration-300" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-base font-black text-foreground mb-2">{name}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed mb-4">{vDesc}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((t) => (
-                      <span key={t} className="text-xs text-muted-foreground border border-border px-2 py-1">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        {/* ✅ FIXED SPECIFICATIONS (MOBILE RESPONSIVE ONLY) */}
+        <div className="p-10 lg:p-16 bg-black/[0.03]">
+          <h2 className="text-xs uppercase tracking-widest mb-8">
+            Specifications
+          </h2>
 
-      {/* ── Why choose ── */}
-      <section className="border-b border-border">
-        <div className="px-6 md:px-10 lg:px-16 py-20">
-          <div className="mb-14">
-            <p className="label-sm mb-4">Why Choose This</p>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
-              Built for
-              <br />
-              <span className="italic font-extralight">South India</span>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border border-border">
-            {whyPoints.map(({ number, title: wTitle, desc }) => (
+          <div className="border rounded-xl overflow-hidden">
+            {specs.map((s) => (
               <div
-                key={number}
-                className="p-8 border-r border-border last:border-r-0 group hover:bg-foreground transition-colors duration-300"
+                key={s.label}
+                className="
+                  flex flex-col sm:flex-row sm:justify-between
+                  gap-1 sm:gap-0
+                  px-5 py-4 border-b last:border-b-0
+                  hover:bg-black/5 transition
+                "
               >
-                <p className="text-5xl font-black text-border group-hover:text-background/20 mb-6 transition-colors">
-                  {number}
-                </p>
-                <h3 className="text-base font-black text-foreground group-hover:text-background mb-3 transition-colors">
-                  {wTitle}
-                </h3>
-                <p className="text-xs text-muted-foreground group-hover:text-background/70 leading-relaxed transition-colors">
-                  {desc}
-                </p>
+                <span className="text-xs uppercase text-black/60 break-words max-w-full sm:max-w-[50%]">
+                  {s.label}
+                </span>
+                <span className="text-sm font-medium break-words max-w-full sm:max-w-[50%] sm:text-right">
+                  {s.value}
+                </span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Related products ── */}
-      <section className="border-b border-border bg-muted/10">
-        <div className="px-6 md:px-10 lg:px-16 py-16">
-          <p className="label-sm mb-8">Also Explore</p>
-          <div className="flex flex-wrap gap-0 border border-border">
-            {relatedLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="flex items-center justify-between gap-3 px-6 py-5 border-r border-b border-border hover:bg-foreground hover:text-background transition-colors duration-200 group min-w-[220px]"
-              >
-                <span className="text-sm font-medium tracking-wide group-hover:text-background transition-colors">{label}</span>
-                <ArrowRight size={14} className="text-muted-foreground group-hover:text-background transition-colors" />
-              </Link>
-            ))}
-          </div>
+      {/* ───────── VARIANTS ───────── */}
+      <section
+        ref={variantRef}
+        className={`px-6 md:px-12 py-20 transition-all duration-700 ${reveal(
+          "variants",
+        )}`}
+      >
+        <h2 className="text-3xl md:text-4xl font-black mb-10">
+          Choose Your <span className="font-light italic">Configuration</span>
+        </h2>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {variants.map((v, i) => (
+            <div
+              key={v.name}
+              className="group rounded-xl border overflow-hidden hover:-translate-y-2 hover:shadow-xl transition"
+            >
+              <div className="relative h-60 overflow-hidden">
+                <Image
+                  src={v.image}
+                  alt={v.name}
+                  fill
+                  className="object-cover group-hover:scale-110 transition duration-700"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition" />
+              </div>
+
+              <div className="p-6">
+                <h3 className="font-black">{v.name}</h3>
+                <p className="text-xs text-black/60 mt-2">{v.description}</p>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {v.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="text-[10px] px-2 py-1 border rounded-full"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => openEnquiry(v)}
+                  className="mt-5 w-full bg-black text-white py-3 text-xs uppercase font-bold hover:scale-[1.02] transition"
+                >
+                  Enquire Now
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="bg-foreground text-background">
-        <div className="px-6 md:px-10 lg:px-16 py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+      {/* ───────── WHY ───────── */}
+      <section
+        ref={whyRef}
+        className={`px-6 md:px-12 py-20 border-t transition-all duration-700 ${reveal(
+          "why",
+        )}`}
+      >
+        <h2 className="text-3xl font-black mb-10">
+          Built for <span className="font-light italic">South India</span>
+        </h2>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 border rounded-xl overflow-hidden">
+          {whyPoints.map((p) => (
+            <div
+              key={p.number}
+              className="p-8 hover:bg-black hover:text-white transition"
+            >
+              <div className="text-4xl font-black opacity-30">{p.number}</div>
+              <h3 className="font-bold mt-3">{p.title}</h3>
+              <p className="text-xs mt-2 opacity-70">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-black text-white px-6 md:px-12 py-16">
+        <div className="flex flex-col md:flex-row justify-between gap-10">
           <div>
-            <p className="text-xs font-bold tracking-widest uppercase opacity-40 mb-3">Ready to Order?</p>
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-tight">
-              Get a Free Quote for<br />
-              <span className="italic font-extralight">{title}</span>
+            <p className="text-xs uppercase opacity-50">Ready to Order</p>
+            <h2 className="text-3xl font-black mt-3">
+              Get a Quote for <span className="italic font-light">{title}</span>
             </h2>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 shrink-0">
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-background text-foreground text-sm font-black tracking-widest uppercase hover:bg-background/90 transition-colors duration-200"
-            >
-              Get Free Quote
-              <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/products"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-background/30 text-background text-sm font-bold tracking-widest uppercase hover:bg-background/10 transition-colors duration-200"
-            >
-              All Products
-            </Link>
-          </div>
+
+          <button
+            onClick={openGeneralEnquiry}
+            className="bg-green-500 px-8 py-4 text-xs uppercase font-black hover:scale-105 transition"
+          >
+            WhatsApp Enquiry
+          </button>
         </div>
       </section>
-    </>
+
+      {/* MODAL */}
+      {enquiryProduct && (
+        <EnquiryModal
+          product={enquiryProduct}
+          onClose={() => setEnquiryProduct(null)}
+        />
+      )}
+    </div>
   );
 }
